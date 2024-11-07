@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Web Crawler Application
 
 Parameters:
-  EmailAddress:
-    Description: Email address to receive price drop notifications
+  S3Bucket:
+    Description: S3 bucket name for the Lambda function code
     Type: String
 
 Resources:
@@ -37,9 +37,6 @@ Resources:
       Code:
         S3Bucket: !Ref S3Bucket
         S3Key: app.zip
-      Environment:
-        Variables:
-          EMAIL_ADDRESS: !Ref EmailAddress
       Role: !GetAtt WebCrawlerFunctionRole.Arn
 
   WebCrawlerFunctionRole:
