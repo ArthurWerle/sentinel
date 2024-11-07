@@ -7,8 +7,6 @@ Parameters:
     Type: String
 
 Resources:
-
-  # DynamoDB Table to store price history
   PriceHistoryTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -23,21 +21,7 @@ Resources:
           KeyType: HASH
         - AttributeName: Timestamp
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-
-  # Lambda Function for Web Crawling and Price Monitoring
-  WebCrawlerFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: WebCrawler
-      Runtime: python3.9
-      Handler: app.handler
-      Code:
-        S3Bucket: !Ref S3Bucket
-        S3Key: app.zip
-      Role: !GetAtt WebCrawlerFunctionRole.Arn
+      BillingMode: PAY_PER_REQUEST
 
   WebCrawlerFunctionRole:
     Type: AWS::IAM::Role
@@ -48,11 +32,11 @@ Resources:
           - Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
-            Action: 'sts:AssumeRole'
+            Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: DynamoDBAccess
+        - PolicyName: WebCrawlerPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -61,27 +45,56 @@ Resources:
                   - dynamodb:PutItem
                   - dynamodb:GetItem
                   - dynamodb:Query
+                  - dynamodb:Scan
                 Resource: !GetAtt PriceHistoryTable.Arn
-        - PolicyName: SESAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
               - Effect: Allow
                 Action:
                   - ses:SendEmail
                   - ses:SendRawEmail
                 Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub arn:aws:s3:::${S3Bucket}/*
 
-  # CloudWatch Event Rule to trigger the Lambda function
-  WebCrawlerSchedule:
+  WebCrawlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: WebCrawler
+      Runtime: python3.9
+      Handler: app.handler
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: app.py.zip
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref PriceHistoryTable
+      Role: !GetAtt WebCrawlerFunctionRole.Arn
+      Timeout: 300
+      MemorySize: 256
+
+  WebCrawlerScheduleRule:
     Type: AWS::Events::Rule
     Properties:
-      ScheduleExpression: 'rate(12 hours)'
+      Description: "Schedule for Web Crawler Lambda Function"
+      ScheduleExpression: "rate(12 hours)"
+      State: ENABLED
       Targets:
         - Arn: !GetAtt WebCrawlerFunction.Arn
-          Id: WebCrawlerFunction
+          Id: "WebCrawlerSchedule"
+
+  WebCrawlerSchedulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WebCrawlerFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt WebCrawlerScheduleRule.Arn
 
 Outputs:
-  PriceHistoryTableName:
-    Description: DynamoDB table name for price history
+  LambdaFunctionArn:
+    Description: ARN of the Lambda function
+    Value: !GetAtt WebCrawlerFunction.Arn
+  DynamoDBTableName:
+    Description: Name of the DynamoDB table
     Value: !Ref PriceHistoryTable
