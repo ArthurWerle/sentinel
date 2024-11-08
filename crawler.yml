@@ -6,6 +6,9 @@ Parameters:
     Description: Path to the Python file for the Lambda function
     Type: String
     Default: app.py
+  S3Bucket:
+    Type: String
+    Description: The name of the S3 bucket where the Python file is stored
 
 Resources:
   PriceHistoryTable:
