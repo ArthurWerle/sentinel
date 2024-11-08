@@ -1,0 +1,24 @@
+org: aturo
+app: sentinel
+service: sentinel
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
+
+functions:
+  cronJob:
+    handler: handler.run
+    events:
+      - schedule: cron(0 12 14 * ? *)
+    environment:
+      SENDER_EMAIL: ${env:SENDER_EMAIL}
+      RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
