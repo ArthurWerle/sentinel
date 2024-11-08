@@ -99,3 +99,9 @@ Outputs:
   DynamoDBTableName:
     Description: Name of the DynamoDB table
     Value: !Ref PriceHistoryTable
+
+Resources:
+  LambdaBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref S3Bucket
