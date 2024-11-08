@@ -2,9 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Web Crawler Application
 
 Parameters:
-  S3Bucket:
-    Description: S3 bucket name for the Lambda function code
+  PythonFile:
+    Description: Path to the Python file for the Lambda function
     Type: String
+    Default: app.py
 
 Resources:
   PriceHistoryTable:
@@ -16,11 +17,20 @@ Resources:
           AttributeType: S
         - AttributeName: Timestamp
           AttributeType: S
+        - AttributeName: Price
+          AttributeType: N
       KeySchema:
         - AttributeName: ProductId
           KeyType: HASH
         - AttributeName: Timestamp
           KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: PriceIndex
+          KeySchema:
+            - AttributeName: Price
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   WebCrawlerFunctionRole:
@@ -47,25 +57,16 @@ Resources:
                   - dynamodb:Query
                   - dynamodb:Scan
                 Resource: !GetAtt PriceHistoryTable.Arn
-              - Effect: Allow
-                Action:
-                  - ses:SendEmail
-                  - ses:SendRawEmail
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                Resource: !Sub arn:aws:s3:::${S3Bucket}/*
 
   WebCrawlerFunction:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: WebCrawler
       Runtime: python3.9
-      Handler: app.handler
+      Handler: index.handler
       Code:
         S3Bucket: !Ref S3Bucket
-        S3Key: app.py.zip
+        S3Key: !Ref PythonFile
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref PriceHistoryTable
