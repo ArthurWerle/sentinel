@@ -1,7 +1,10 @@
-# Sentinel
-### Web crawler to look for things 
+# Sentinel 👀
+## Automated Cron Job to send emails when triggered
+### mainly created to watch for prices and send my personal invoices.
 
-#### Using AWS CLI to study devops and infra as a code.
+#### Dependencies
+- `serverless` framework
+- `node`
 
-- `chmod +x deploy.sh`
-- `./deploy.sh`
+#### Running it
+- `serverless deploy`
