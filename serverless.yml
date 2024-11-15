@@ -5,20 +5,38 @@ service: sentinel
 provider:
   name: aws
   runtime: nodejs20.x
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - ses:SendEmail
-            - ses:SendRawEmail
-          Resource: "*"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - ses:SendEmail
+        - ses:SendRawEmail
+      Resource: "*"
 
 functions:
-  cronJob:
-    handler: handler.run
+  webScraper:
+    handler: handler.handler
     events:
-      - schedule: cron(0 12 14 * ? *)
-    environment:
-      SENDER_EMAIL: ${env:SENDER_EMAIL}
-      RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
+      - schedule: cron(0 0 * * ? *) 
+
+resources:
+  Resources:
+    CPUPricesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: cpu-prices
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+environment:
+  SENDER_EMAIL: ${env:SENDER_EMAIL}
+  RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
+  AWS_REGION: us-east-1
