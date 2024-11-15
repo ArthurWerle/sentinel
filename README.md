@@ -1,6 +1,6 @@
 # Sentinel 👀
 ## Automated Cron Job to send emails when triggered
-### mainly created to watch for prices and send my personal invoices.
+### mainly created to watch for prices and send and email
 
 #### Dependencies
 - `serverless` framework
