@@ -1,12 +1,19 @@
 export const VENDOR_URLS = [
-  // i7 12700F
-  'https://www.pichau.com.br/processador-intel-core-i7-12700f-12-core-20-threads-2-1ghz-4-9ghz-turbo-cache-25mb-lga1700-bx8071512700f-br',
-  'https://www.magazineluiza.com.br/processador-intel-core-i7-12700-cache-25mb-2-1ghz-4-9ghz-max-turbo-lga-1700-bx8071512700/p/hh6g2je57h/in/prsd/',
-  'https://www.kabum.com.br/produto/283710/processador-intel-core-i7-12700-cache-25mb-2-1ghz-4-9ghz-max-turbo-lga-1700-bx8071512700',
-  // i7 13700F
-  'https://www.magazineluiza.com.br/processador-intel-core-i7-13700f-box-lga-1700-30mb-cache-sem-video-integrado-bx8071513700f/p/fbdhg19814/in/prsd/',
-  'https://www.kabum.com.br/produto/421577/processador-intel-core-i7-13700f-box-lga-1700-30mb-cache-sem-video-integrado-bx8071513700f',
-  'https://www.gkinfostore.com.br/processador-intel-core-i7-13700f-2.1ghz/5.2ghz-16-core-rocket-lake-s-30mb-cache-lga-1700-bx8071513700f',
+  // Auxiliadora Predial
+  'https://www.auxiliadorapredial.com.br/imovel/aluguel/350842/apartamento-bom-fim+porto-alegre+rio-grande-do-sul#detalhe',
+  // Zap Imoveis
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-mobiliado-bom-fim-porto-alegre-rs-125m2-id-2705794320/#lead=visita',
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-com-lareira-auxiliadora-porto-alegre-rs-118m2-id-2749847949/#lead=visita',
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-mobiliado-auxiliadora-porto-alegre-rs-105m2-id-2749840073/#lead=visita',
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-auxiliadora-porto-alegre-rs-110m2-id-2760112231/#lead=visita',
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-com-jardim-bela-vista-porto-alegre-rs-152m2-id-2757955832/#lead=visita',
+  'https://www.zapimoveis.com.br/imovel/aluguel-apartamento-3-quartos-com-elevador-auxiliadora-porto-alegre-rs-109m2-id-2759224841/#lead=visita',
+  // Viva Real
+  'https://www.vivareal.com.br/imovel/apartamento-3-quartos-rio-branco-bairros-porto-alegre-com-garagem-108m2-aluguel-RS3000-id-2754541758/#lead=visita',
+  // Quinto Andar
+  'https://www.quintoandar.com.br/imovel/894696751/alugar',
+  'https://www.quintoandar.com.br/imovel/894694273/alugar',
+  'https://www.quintoandar.com.br/imovel/894647067/alugar'
 ];
 
 export const TABLE_NAME = 'cpu-prices';

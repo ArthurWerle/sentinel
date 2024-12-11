@@ -22,10 +22,10 @@ functions:
 
 resources:
   Resources:
-    CPUPricesTable:
+    PricesTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: cpu-prices
+        TableName: prices
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

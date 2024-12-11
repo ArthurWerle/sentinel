@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const utils = require('./utils')
 const constants = require('./constants')
 
-const { findPrice } = utils
+const { findPrice, extractIdFromUrl } = utils
 const { VENDOR_URLS, TABLE_NAME } = constants
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
@@ -12,7 +12,7 @@ const ses = new AWS.SES({ region: process.env.AWS_REGION });
 const SENDER_EMAIL = process.env.SENDER_EMAIL;
 const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL;
 
-async function scrapeCpuPrices() {
+async function scrapePrices() {
   const prices = {};
 
   const browser = await puppeteer.launch();
@@ -27,15 +27,8 @@ async function scrapeCpuPrices() {
       return priceElement
     });
 
-    let cpu;
-    if (url.includes('14600')) {
-      cpu = '14600';
-    } else if (url.includes('13700')) {
-      cpu = '13700';
-    } else {
-      cpu = '12600';
-    }
-    prices[cpu] = price;
+    const id = extractIdFromUrl(url)
+    prices[id] = price;
   }
 
   await browser.close();
@@ -49,20 +42,20 @@ async function checkAndAlert(newPrices) {
     }).promise();
 
     let message = '';
-    for (const cpu in newPrices) {
-      const newPrice = newPrices[cpu];
-      const existingItem = existingPrices.Items.find(item => item.cpu === cpu);
+    for (const item in newPrices) {
+      const newPrice = newPrices[item];
+      const existingItem = existingPrices.Items.find(item => item.item === item);
       const oldPrice = existingItem?.price;
       if (!oldPrice || newPrice < oldPrice) {
-        message += `O preço do ${cpu} diminui de R$${oldPrice?.toFixed(2) ?? 'N/A'} para R$${newPrice.toFixed(2)}\n`;
+        message += `O preço do ${item} diminui de R$${oldPrice?.toFixed(2) ?? 'N/A'} para R$${newPrice.toFixed(2)}\n`;
       }
     }
 
-    for (const cpu in newPrices) {
-      const newPrice = newPrices[cpu];
+    for (const item in newPrices) {
+      const newPrice = newPrices[item];
       await dynamodb.put({
         TableName: TABLE_NAME,
-        Item: { id: 'cpu-prices', cpu, price: newPrice }
+        Item: { id: 'prices', item, price: newPrice }
       }).promise();
     }
 
@@ -71,7 +64,7 @@ async function checkAndAlert(newPrices) {
         Destination: { ToAddresses: [RECIPIENT_EMAIL] },
         Message: {
           Body: { Text: { Data: message } },
-          Subject: { Data: '🚨 Alerta queda de preço de CPU 🚨' }
+          Subject: { Data: '🚨 Alerta queda de preço de imóvel 🚨' }
         },
         Source: SENDER_EMAIL
       }).promise();
@@ -83,7 +76,7 @@ async function checkAndAlert(newPrices) {
 }
 
 exports.handler = async (event) => {
-  const newPrices = await scrapeCpuPrices();
+  const newPrices = await scrapePrices();
   await checkAndAlert(newPrices);
   return { statusCode: 200, body: 'CPU price check and alert complete' };
 };
