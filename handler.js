@@ -13,7 +13,7 @@ const SENDER_EMAIL = process.env.SENDER_EMAIL;
 const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL;
 
 async function scrapePrices() {
-  const prices = {};
+  const items = {};
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -28,34 +28,41 @@ async function scrapePrices() {
     });
 
     const id = extractIdFromUrl(url)
-    prices[id] = price;
+    items[id] = {
+      price: price,
+      url: url
+    }
   }
 
   await browser.close();
-  return prices;
+  return items;
 }
 
-async function checkAndAlert(newPrices) {
+async function checkAndAlert(newItems) {
   try {
     const existingPrices = await dynamodb.scan({ 
       TableName: TABLE_NAME
     }).promise();
 
     let message = '';
-    for (const item in newPrices) {
-      const newPrice = newPrices[item];
-      const existingItem = existingPrices.Items.find(item => item.item === item);
+    for (const newItemKey in newItems) {
+      const newPrice = newItems[newItemKey].price;
+      const url = newItems[newItemKey].url;
+      console.log({ newItemKey, existingPrices })
+      const existingItem = existingPrices.Items.find(item => item.id === newItems[newItemKey].id);
       const oldPrice = existingItem?.price;
       if (!oldPrice || newPrice < oldPrice) {
-        message += `O preço do ${item} diminui de R$${oldPrice?.toFixed(2) ?? 'N/A'} para R$${newPrice.toFixed(2)}\n`;
+        message += `O preço do ${url} diminui de R$${oldPrice?.toFixed(2) ?? 'N/A'} para R$${newPrice.toFixed(2)}\n`;
       }
     }
 
-    for (const item in newPrices) {
-      const newPrice = newPrices[item];
+    for (const newItemKey in newItems) {
+      const newPrice = newItems[newItemKey].price;
+      const url = newItems[newItemKey].url;
+
       await dynamodb.put({
         TableName: TABLE_NAME,
-        Item: { id: 'prices', item, price: newPrice }
+        Item: { id: 'prices', url: url, price: newPrice }
       }).promise();
     }
 
