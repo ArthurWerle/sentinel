@@ -8,7 +8,7 @@ const { VENDOR_URLS, TABLE_NAME } = constants
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const ses = new AWS.SES({ region: process.env.AWS_REGION });
+const ses = new AWS.SES({ region: process.env.DEFAULT_AWS_REGION });
 const SENDER_EMAIL = process.env.SENDER_EMAIL;
 const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL;
 

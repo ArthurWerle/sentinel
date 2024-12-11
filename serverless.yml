@@ -16,7 +16,7 @@ provider:
   environment:
     SENDER_EMAIL: ${env:SENDER_EMAIL}
     RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
-    AWS_REGION: us-east-1
+    DEFAULT_AWS_REGION: us-east-1
 
 functions:
   webScraper:
