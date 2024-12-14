@@ -6,7 +6,7 @@ function handlePrice(text) {
   return null;
 }
 
-export function extractIdFromUrl(url) {
+module.exports.extractIdFromUrl = (url) => {
   let id = null;
 
   if (url.includes('auxiliadorapredial.com.br')) {
@@ -29,7 +29,7 @@ export function extractIdFromUrl(url) {
 }
 
 
-export async function findPrice(page) {
+module.exports.findPrice = async (page) => {
   let price = await page.evaluate(() => {
     const priceElement = document.querySelector('.valores-imovel-caracteristicas span');
     return priceElement ? handlePrice(priceElement.textContent) : null;

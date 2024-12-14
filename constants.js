@@ -1,4 +1,4 @@
-export const VENDOR_URLS = [
+module.exports.VENDOR_URLS = [
   // Auxiliadora Predial
   'https://www.auxiliadorapredial.com.br/imovel/aluguel/350842/apartamento-bom-fim+porto-alegre+rio-grande-do-sul#detalhe',
   // Zap Imoveis
@@ -16,4 +16,4 @@ export const VENDOR_URLS = [
   'https://www.quintoandar.com.br/imovel/894647067/alugar'
 ];
 
-export const TABLE_NAME = 'cpu-prices';
+module.exports.TABLE_NAME = 'cpu-prices';
